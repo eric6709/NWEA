@@ -1,13 +1,5 @@
-<<<<<<< HEAD
----
-title: "README - NWEA MAP Data Processing Scripts"
-author: "Eric Stevens"
-output: html_document
----
-=======
 # NWEA
 Scripts for processing NWEA MAP test results
->>>>>>> db7c19bf21851a194971a3c9237e56500f75935a
 
 ##Purpose of the Scripts
 This repository contains several scripts written in R. These can be used to process data files downloaded from NWEA MAP into reports that show growth by class and grade level and include various metrics used by Lighthouse Academies. The resulting reports are intended to supplement the existing reports available through the MAP site. As summaries, they do not provide the student-level data that is most valuable for teachers in differentiating instruction. They do, however, help automate the production of reports that show summarized results for all ELA or math classes on a single page.
