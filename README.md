@@ -2,7 +2,7 @@
 Scripts for processing NWEA MAP test results
 
 ##Purpose of the Scripts
-This folder contains several scripts written in R. These can be used to process data files downloaded from NWEA MAP into reports that show growth by class and grade level and include various metrics used by Lighthouse Academies. The resulting reports are intended to supplement the existing reports available through the MAP site. As summaries, they do not provide the student-level data that is most valuable for teachers in differentiating instruction. They do, however, help automate the production of reports that show summarized results for all ELA or math classes on a single page.
+This repository contains several scripts written in R. These can be used to process data files downloaded from NWEA MAP into reports that show growth by class and grade level and include various metrics used by Lighthouse Academies. The resulting reports are intended to supplement the existing reports available through the MAP site. As summaries, they do not provide the student-level data that is most valuable for teachers in differentiating instruction. They do, however, help automate the production of reports that show summarized results for all ELA or math classes on a single page.
 
 ##List of Files
 1. FormatClassAssignments.R (partially automates the initial preparation of class assignments file to prepare it for use in the other scripts)
