@@ -12,25 +12,40 @@ library(reshape2)
 classfilename <- readline(prompt="Enter name of class assignments file to process. Include the .csv extension: ")
 classes <- read.csv(classfilename)
 
-## Remove any rows in which the class name does not start with the word "Homeroom", "ELA", "Reading," Math", or "Algebra."
-rowlist <- grep("^homeroom|^ela|^math|^reading|^algebra", classes$ClassName, ignore.case=TRUE)
+## Remove any rows in which the class name does not start with the word "Homeroom", "ELA", "Reading," "Language Arts," "Math", or "Algebra."
+rowlist <- grep("^homeroom|^ela|^math|^reading|^algebra|^language arts", classes$ClassName, ignore.case=TRUE)
 classes <- classes[rowlist,]
+rm(rowlist)
 
 ## Remove all other characters from the class names, effectively changing them to subject names
-## Also change "Reading" (if used) to "ELA" and "Algebra" (if used) to "Math"
+## Also change "Reading" or "Language Arts" (if used) to "ELA" and "Algebra" (if used) to "Math"
 classes$ClassName <- gsub("homeroom.*", "Homeroom", classes$ClassName, ignore.case=TRUE)
 classes$ClassName <- gsub("ela.*", "ELA", classes$ClassName, ignore.case=TRUE)
+classes$ClassName <- gsub("language.*", "ELA", classes$ClassName, ignore.case=TRUE)
 classes$ClassName <- gsub("math.*", "Math", classes$ClassName, ignore.case=TRUE)
 classes$ClassName <- gsub("reading.*", "ELA", classes$ClassName, ignore.case=TRUE)
 classes$ClassName <- gsub("algebra.*", "Math", classes$ClassName, ignore.case=TRUE)
 
-## Cast into wide format, replace missing ELA or math teacher names with homeroom teacher and delete homerooms
+## Check for students enrolled in multiple classes of the same type
+classes$uqcheck <- paste(classes$StudentID, classes$ClassName)
+if(sum(duplicated(classes$uqcheck))>0)
+{warning("Some students are assigned to more than one ELA, math, or homeroom class. Remove duplicates in data file and try again.")}
+
+## Cast into wide format
 classeswide <- dcast(classes, StudentID~ClassName, value.var="TeacherName")
-if(!"ELA" %in% colnames(classeswide)){classeswide$ELA<-NA}
-classeswide$ELA[is.na(classeswide$ELA)] <- classeswide$Homeroom[is.na(classeswide$ELA)]
-if(!"Math" %in% colnames(classeswide)){classeswide$Math<-NA}
-classeswide$Math[is.na(classeswide$Math)] <- classeswide$Homeroom[is.na(classeswide$Math)]
-classeswide <- select(classeswide, -Homeroom)
+
+## Replace missing ELA or math teacher names with homeroom teacher (if available) and delete homerooms
+if(!"ELA" %in% colnames(classeswide))
+        {classeswide$ELA<-NA}
+if("Homeroom" %in% colnames(classeswide))
+        {classeswide$ELA[is.na(classeswide$ELA)] <- classeswide$Homeroom[is.na(classeswide$ELA)]}
+if(!"Math" %in% colnames(classeswide))
+        {classeswide$Math<-NA}
+if("Homeroom" %in% colnames(classeswide))
+        {classeswide$Math[is.na(classeswide$Math)] <- classeswide$Homeroom[is.na(classeswide$Math)]}
+if("Homeroom" %in% colnames(classeswide))
+        {classeswide <- select(classeswide, -Homeroom)}
+
 names(classeswide) <- c("StudentID","ELATeacher","MathTeacher")
 
 ## Save file and print messages
