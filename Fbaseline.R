@@ -1,4 +1,4 @@
-## NWEA MAP Calculation of Fall Baseline Results by Class and Grade, Displayed with Lighthouse Academies Metrics
+## NWEA MAP Calculation of Fall Baseline Results by Class, Displayed with Lighthouse Academies Metrics
 
 ## Load required R packages
 library(dplyr)
@@ -6,7 +6,7 @@ library(dplyr)
 print("NWEA MAP Fall Baseline by Class and Grade")
 print("This program requires as input the AssessmentResults.csv, StudentsBySchool.csv, and processed ClassAssignments.csv files from the NWEA Comprehensive Data File Package. These should all be for the FALL term.") 
 print("It also requires that the file 2015NWEANorms.csv be in the working directory.")
-print("The program outputs tables with baseline data for each class and grade level.")
+print("The program outputs tables with baseline data for each class.")
 print("Please see the readme file for important information on file name and pre-processing requirements")
 
 ## Read Assessment Results file from CDF package into R
@@ -64,30 +64,24 @@ frdata <- mutate(frdata, Q1=Quartile==1, Q2=Quartile==2, Q3=Quartile==3, Q4=Quar
 ## Summarize the data by class and add fall norms
 fmbyclass <- fmdata %>% group_by(Grade, MathTeacher) %>%
         summarize(NumberTested = n(), AvgMathRIT = mean(TestRITScore), NumberinQuartile1 = sum(Q1), NumberinQuartile2 = sum(Q2), NumberinQuartile3 = sum(Q3), NumberinQuartile4 = sum(Q4))
-fmnorms <- select(norms, Grade, NationalNormFallMeanMathRIT, TypicalFallToSpringMathGrowth)
+fmnorms <- select(norms, Grade, NationalNormFallMeanMathRIT, TypicalFallToSpringMathGrowth, SpringMath75thPercentile)
 fmbyclass <- merge(fmbyclass, fmnorms)
-fmbyclass <- fmbyclass[,c(1,2,3,4,9,10,5,6,7,8)]
+fmbyclass <- mutate(fmbyclass, PercentInHighestQuartile = NumberinQuartile4/NumberTested)
+fmbyclass <- mutate(fmbyclass, Percent120ofTypicalMathGrowth = TypicalFallToSpringMathGrowth*1.2)
+fmbyclass <- fmbyclass[,c(1,2,3,4,9,11,5,6,7,8,12,10,13)]
+
 frbyclass <- frdata %>% group_by(Grade, ELATeacher) %>%
         summarize(NumberTested = n(), AvgReadRIT = mean(TestRITScore), NumberinQuartile1 = sum(Q1), NumberinQuartile2 = sum(Q2), NumberinQuartile3 = sum(Q3), NumberinQuartile4 = sum(Q4))
-frnorms <- select(norms, Grade, NationalNormFallMeanReadingRIT, TypicalFallToSpringReadingGrowth)
+frnorms <- select(norms, Grade, NationalNormFallMeanReadingRIT, TypicalFallToSpringReadingGrowth, SpringReading75thPercentile)
 frbyclass <- merge(frbyclass, frnorms)
-frbyclass <- frbyclass[,c(1,2,3,4,9,10,5,6,7,8)]
+frbyclass <- mutate(frbyclass, PercentInHighestQuartile = NumberinQuartile4/NumberTested)
+frbyclass <- mutate(frbyclass, Percent120ofTypicalReadingGrowth = TypicalFallToSpringReadingGrowth*1.2)
+frbyclass <- frbyclass[,c(1,2,3,4,9,11,5,6,7,8,12,10,13)]
 
-## Summarize data by grade and add fall norms
-fmbygrade <- fmdata %>% group_by(Grade) %>%
-        summarize(NumberTested = n(), AvgMathRIT = mean(TestRITScore), NumberinQuartile1 = sum(Q1), NumberinQuartile2 = sum(Q2), NumberinQuartile3 = sum(Q3), NumberinQuartile4 = sum(Q4))
-fmbygrade <- merge(fmbygrade, fmnorms)
-fmbygrade <- fmbygrade[,c(1,2,3,8,9,4,5,6,7)]
-frbygrade <- frdata %>% group_by(Grade) %>%
-        summarize(NumberTested = n(), AvgReadRIT = mean(TestRITScore), NumberinQuartile1 = sum(Q1), NumberinQuartile2 = sum(Q2), NumberinQuartile3 = sum(Q3), NumberinQuartile4 = sum(Q4))
-frbygrade <- merge(frbygrade, frnorms)
-frbygrade <- frbygrade[,c(1,2,3,8,9,4,5,6,7)]
 
 ## Save tables to files and print completion message
 write.csv(fmbyclass, file="FallMathScoresByClass.csv", row.names=FALSE)
 write.csv(frbyclass, file="FallReadingScoresByClass.csv", row.names=FALSE)
-write.csv(fmbygrade, file="FallMathScoresByGrade.csv", row.names=FALSE)
-write.csv(frbygrade, file="FallReadingScoresByGrade.csv", row.names=FALSE)
 print("Processing complete!")
 print("Output files have been saved in working directory.")
 print("Move or rename output files before running this script again, or else files will be overwritten.")
