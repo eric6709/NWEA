@@ -12,8 +12,8 @@ library(reshape2)
 classfilename <- readline(prompt="Enter name of class assignments file to process. Include the .csv extension: ")
 classes <- read.csv(classfilename)
 
-## Remove any rows in which the class name does not start with the word "Homeroom", "ELA", "Reading," "Language Arts," "Math", or "Algebra."
-rowlist <- grep("^homeroom|^ela|^math|^reading|^algebra|^language arts", classes$ClassName, ignore.case=TRUE)
+## Remove any rows in which the class name does not start with the word "Homeroom", "ELA", "Reading," "Language Arts," "English," "Math", or "Algebra."
+rowlist <- grep("^homeroom|^ela|^math|^reading|^english|^algebra|^language arts", classes$ClassName, ignore.case=TRUE)
 classes <- classes[rowlist,]
 rm(rowlist)
 
@@ -24,6 +24,7 @@ classes$ClassName <- gsub("ela.*", "ELA", classes$ClassName, ignore.case=TRUE)
 classes$ClassName <- gsub("language.*", "ELA", classes$ClassName, ignore.case=TRUE)
 classes$ClassName <- gsub("math.*", "Math", classes$ClassName, ignore.case=TRUE)
 classes$ClassName <- gsub("reading.*", "ELA", classes$ClassName, ignore.case=TRUE)
+classes$ClassName <- gsub("english.*", "ELA", classes$ClassName, ignore.case=TRUE)
 classes$ClassName <- gsub("algebra.*", "Math", classes$ClassName, ignore.case=TRUE)
 
 ## Check for students enrolled in multiple classes of the same type
@@ -45,7 +46,7 @@ if("Homeroom" %in% colnames(classeswide))
         {classeswide$Math[is.na(classeswide$Math)] <- classeswide$Homeroom[is.na(classeswide$Math)]}
 if("Homeroom" %in% colnames(classeswide))
         {classeswide <- select(classeswide, -Homeroom)}
-
+classeswide <- select(classeswide, StudentID, ELA, Math)
 names(classeswide) <- c("StudentID","ELATeacher","MathTeacher")
 
 ## Save file and print messages
